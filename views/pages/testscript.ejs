@@ -1,0 +1,126 @@
+<%- include('../partials/head'); %>
+
+    <div class="center">
+        <ul class="nav nav-tabs"
+            style="color: black;background-color:transparent;width: 800px;display:inline-flex;text-align: left;border: transparent;">
+            <li class="nav-item" style="border: transparent;">
+                <a class="nav-link" href="/" style="font-size: larger;font-weight: bold;">Home</a>
+            </li>
+            <li class="nav-item" style="border: transparent;">
+                <a class="nav-link" href="/testcase" style="font-size: larger;font-weight: bold;">Test Case
+                    Generator</a>
+            </li>
+
+            <li class="nav-item" style="border: transparent;">
+                <a class="nav-link active" href="/testscript" style="font-size: larger;font-weight: bold;">Test Script
+                    Generator</a>
+            </li>
+            <li class="nav-item" style="border: transparent;">
+                <a class="nav-link" href="/testdata" style="font-size: larger;font-weight: bold;">Test Data
+                    Generator</a>
+            </li>
+        </ul>
+
+        <div class="card-body" id="testGen" style="text-align: center;">
+            <div class="card" style="height: 400px;width: 1300px;">
+                <table>
+                    <tbody>
+
+                        <tr>
+                            <td><br></td>
+
+                        </tr>
+                        <tr>
+                            <td class="col-6">
+                                <label for="tool">Automation Tool</label>
+                                <select name="tool" id="tool" onchange="changeTools()">
+                                    <option value="selenium">Selenium</option>
+                                    <option value="webdriverio">WebdriverIO</option>
+                                    <option value="playwright">Playwright</option>
+                                    <option value="pupeteer">Pupeteer</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><br></td>
+
+                        </tr>
+                        <tr>
+                            <td class="col-6">
+                                <label for="language">Programming Language</label>
+                                <select name="language" id="language" onchange="changeLanguage()">
+                                    <option value="csharp">C#</option>
+                                    <option value="java">Java</option>
+
+                                    <option value="javascript">Javascript</option>
+                                    <option value="python">Python</option>
+                                </select>
+                            </td>
+                          
+                        </tr>
+                        <tr>
+                            <td><br></td>
+
+                        </tr>
+                        <tr>
+                            <td class="col-6">
+                                <label for="framework">Automation Framework</label>
+                                <select name="framework" id="framework" onchange="changeFramework()">
+                                    <option value="nunit">Nunit</option>
+                                
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><br></td>
+
+                        </tr>
+                        <tr>
+                            <td class="col-6">
+                                <br>
+                                <form class="upload">
+                                    Upload Test Cases <input type="file" name="uploadFile" accept=".csv" required />
+                                    <br /><br />
+                                    <input class="btn btn-secondary" type="submit" style="border-radius: 4px;"
+                                        name="testCaseFileBtn" value="Generate">
+                                </form>
+
+                                <br>
+                               
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <br>
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td class="col-6">
+                                <a id="downloadFileLink" style="visibility: hidden;">Click here to download test
+                                    scripts</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+    <div id="overlay">
+        <div class="loader"></div>
+    </div>
+    <script src="/src/script_testScriptGen.js">
+
+    </script>
+    <style type="text/css">
+        #uploadMessage {
+            position: absolute;
+            top: WHEREVER;
+            left: WHEREEVER;
+            z-Index: 100;
+        }
+    </style>
+    <%- include('../partials/footer'); %>

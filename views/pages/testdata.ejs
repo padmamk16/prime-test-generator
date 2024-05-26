@@ -1,0 +1,90 @@
+<%- include('../partials/head'); %>
+    <div class="center">
+        <ul class="nav nav-tabs"
+            style="color: black;background-color:transparent;width: 800px;display:inline-flex;text-align: left;border: transparent;">
+            <li class="nav-item" style="border: transparent;">
+                <a class="nav-link" href="/" style="font-size: larger;font-weight: bold;">Home</a>
+            </li>
+            <li class="nav-item" style="border: transparent;">
+                <a class="nav-link" href="/testcase" style="font-size: larger;font-weight: bold;">Test Case
+                    Generator</a>
+            </li>
+           
+            <li class="nav-item" style="border: transparent;">
+                <a class="nav-link" href="/testscript" style="font-size: larger;font-weight: bold;">Test Script
+                    Generator</a>
+            </li>
+            <li class="nav-item" style="border: transparent;">
+                <a class="nav-link active" href="/testdata" style="font-size: larger;font-weight: bold;">Test Data
+                    Generator</a>
+            </li>
+        </ul>
+
+        <div class="card-body" id="testGen" style="text-align: center;">
+            <div class="card" style="height: 400px;width: 1000px;">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td class="col-6">
+                               
+                                    <label for="swagger">Swagger URL <input id="swagger" style="width: 400px;" placeholder="Enter the swagger url"
+                                        type="text"></input></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><br></td>
+
+                        </tr>
+                        <tr>
+                            <td class="col-6">
+                                <label for="endpoint">Endpoint  <input id="endpoint" style="width: 400px;" placeholder="Enter the endpoint"
+                                    type="text"></input></label>
+                               
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><br></td>
+
+                        </tr>
+                        <tr>
+                            <td class="col-6">
+                                <button id="generateTestData" onclick="return generateTestData()"
+                                    class="btn btn-secondary"> Generate</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <br>
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td class="col-6">
+                                <a id="downloadFileLink" style="visibility: hidden;">Click here to download test
+                                    cases</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <br>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                    <br>
+
+
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+    <div id="overlay">
+        <div class="loader"></div>
+    </div>
+    <script src="/src/script_testDataGen.js">
+
+    </script>
+    <%- include('../partials/footer'); %>

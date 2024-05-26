@@ -1,0 +1,9 @@
+version: '1'
+services:
+  prime-test-gen:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name:  prime-test-gen
+    ports:
+      - "3000:3000"
