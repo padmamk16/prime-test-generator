@@ -37,11 +37,13 @@ async function generateTestData() {
     })
 
     let resData = await response.blob()
+    let resHeader = response.headers.get('Content-Disposition')
+    let fileName = resHeader.toString().split('filename=')[1]
     document.querySelector('#overlay').style.visibility = "hidden"
 
     const downloadObjectURL = URL.createObjectURL(resData)
     downloadFileLink.style.visibility = "visible"
 
     downloadFileLink.href = downloadObjectURL
-    downloadFileLink.setAttribute('download', `TestData.txt`)
+    downloadFileLink.setAttribute('download', fileName)
 }

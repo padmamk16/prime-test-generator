@@ -49,10 +49,11 @@ async function generateTestCase() {
     })
 
     let excelData = await response.blob()
-
+    let resHeader = response.headers.get('Content-Disposition')
+    let fileName = resHeader.toString().split('filename=')[1]
     const downloadExcelObjectURL = URL.createObjectURL(excelData)
     downloadFileLink.href = downloadExcelObjectURL
-    downloadFileLink.setAttribute('download', 'TestCases.csv')
+    downloadFileLink.setAttribute('download', fileName)
     document.querySelector('#overlay').style.visibility = "hidden"
     downloadFileLink.style.visibility = "visible"
 }

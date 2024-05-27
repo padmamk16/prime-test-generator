@@ -7,6 +7,7 @@ const fs = require('fs')
 const fileUpload = require("express-fileupload")
 let filePath
 const archiver = require('archiver')
+const moment = require('moment')
 //const OpenAI = require('openai')
 
 //const openai = new OpenAI({ apiKey: 'My API Key' })
@@ -72,13 +73,16 @@ app.post('/testCaseGenerator', async (req, res) => {
 TC001,Verify amount due is displayed in the emailed water bill statement,None,"1. Receive the emailed water bill statement.\n2. Open the email and review the bill statement.",The email displays the amount due prominently.,Critical,Billing,Functional
 TC002,Verify due date is displayed in the emailed water bill statement,None,"1. Receive the emailed water bill statement.\n2. Open the email and review the bill statement.",The email displays the due date prominently.,Critical,Billing,Functional`
 
-    fileName = 'TestCases.csv'
+    fileName = `TestCases${moment().format('YYYYMMDD-hhmmss')}.csv`
     fs.writeFile(`${tempFolder}\\${fileName}`, str, (err) => {
 
         // In case of a error throw err.
         if (err) throw err;
     })
-    res.setHeader('Content-Disposition', 'attachment')
+    res.setHeader(
+        'Content-Disposition',
+        'attachment; filename=' + fileName
+      )
     res.sendFile(`${tempFolder}\\${fileName}`)
 
 });
@@ -86,7 +90,7 @@ TC002,Verify due date is displayed in the emailed water bill statement,None,"1. 
 app.post('/testDataGenerator', async (req, res) => {
     let swagger = req.body.swagger,
         endpoint = req.body.endpoint,
-        fileName = `TestData.txt`
+        fileName = `TestData${moment().format('YYYYMMDD-hhmmss')}.txt`
     let testDataTemplate = `Generate all the possible combinations of test data based on the ${swagger} and the ${endpoint}`
     let str = `TestData`
     let tempFolder = path.join(__dirname, '/downloads')
@@ -104,7 +108,10 @@ app.post('/testDataGenerator', async (req, res) => {
         // In case of a error throw err.
         if (err) throw err;
     })
-    res.setHeader('Content-Disposition', 'attachment')
+    res.setHeader(
+        'Content-Disposition',
+        'attachment; filename=' + fileName
+      )
     res.sendFile(`${tempFolder}\\${fileName}`)
 })
 
@@ -146,7 +153,7 @@ app.post("/upload", async (req, res) => {
 
     // Set the response headers
     res.attachment('files.zip')
-
+   
     zip.pipe(res)
     files.forEach(file => {
         zip.file(file.path, { name: file.name });
