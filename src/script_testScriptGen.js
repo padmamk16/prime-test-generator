@@ -15,6 +15,7 @@ uploadForm.addEventListener("submit", async function (e) {
   const data = {
     language: language.value,
     tool: tool.value,
+    framework: framework.value
   };
   let file = e.target.uploadFile.files[0];
   let formData = new FormData();
@@ -25,6 +26,7 @@ uploadForm.addEventListener("submit", async function (e) {
     headers: {
       language: data.language,
       tool: data.tool,
+      framework: data.framework
     },
   });
 

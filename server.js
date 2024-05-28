@@ -5,9 +5,9 @@ const PORT = 3000;
 const bodyParser = require("body-parser");
 const fs = require("fs");
 const fileUpload = require("express-fileupload");
-let filePath;
+const moment = require("moment");
 const archiver = require("archiver");
-const OpenAIUtil = require("./utils/openai.util");
+const OpenAIUtil  = require("./utils/openai.util");
 
 app.use(express.static(path.join(__dirname)));
 app.use(fileUpload());
@@ -39,11 +39,10 @@ app.listen(PORT, (error) => {
 app.post("/testCaseGenerator", async (req, res) => {
   let tcDesc = req.body.tcDesc,
     userInput = req.body.userInput,
-    fileName,
-    testCaseTemplate;
-  let scenarioTCTemplate = `Generate all the critical scenarios, any additional scenarios to provide comprehensive coverage and edge cases for ${tcDesc} using JIRA Test Case template sections Test Case ID,Summary starting with verify, Preconditions, Test Steps, Expected Result, Priority, Labels, Test Type in a csv file`;
+    testCaseTemplate
+  let scenarioTCTemplate = `Generate all the critical scenarios, any additional scenarios to provide comprehensive coverage and edge cases for ${tcDesc} using JIRA Test Case template sections Test Case ID,Summary starting with verify, Preconditions, Test Steps, Expected Result, Priority, Labels, Test Type in a comma separated csv file`;
 
-  let acTestCaseTemplate = `Generate all the critical scenarios, any additional scenarios to provide comprehensive coverage and edge cases for for below acceptance criteria using JIRA Test Case template sections Test Case ID,Summary starting with verify, Preconditions, Test Steps, Expected Result, Priority, Labels, Test Type in a csv file
+  let acTestCaseTemplate = `Generate all the critical scenarios, any additional scenarios to provide comprehensive coverage and edge cases for for below acceptance criteria using JIRA Test Case template sections Test Case ID,Summary starting with verify, Preconditions, Test Steps, Expected Result, Priority, Labels, Test Type in a comma separated csv file
         Acceptance Criteria: `;
 
   if (userInput === "scenario") {
@@ -51,26 +50,27 @@ app.post("/testCaseGenerator", async (req, res) => {
   } else {
     testCaseTemplate = acTestCaseTemplate;
   }
-
-  fileName = await OpenAIUtil.generateTestCases(testCaseTemplate);
+  let fileName = `TestCases_${moment().format("YYYYMMDD_hhmmss")}.csv`;
+  let filePath = await OpenAIUtil.generateTestCases(testCaseTemplate, fileName);
   res.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-  res.sendFile(fileName);
+  res.sendFile(filePath)
 });
 
 app.post("/testDataGenerator", async (req, res) => {
   let swagger = req.body.swagger,
     endpoint = req.body.endpoint;
   let testDataTemplate = `Generate all the possible combinations of test data based on the ${swagger} and the ${endpoint}`;
-  let fileName = await OpenAIUtil.generateTestData(testDataTemplate);
+  let fileName = `TestData_${moment().format("YYYYMMDD_hhmmss")}.txt`;
+  let filePath = await OpenAIUtil.generateTestData(testDataTemplate, fileName);
   res.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-  res.sendFile(fileName);
+  res.sendFile(filePath);
 });
 
 app.post("/upload", async (req, res) => {
   var language = req.headers.language,
     tool = req.headers.tool,
-    framework = req.headers.framework;
-
+    autoFramework = req.headers.framework;
+  var framework = autoFramework !== '-' ? autoFramework : ''
   let testScriptTemplate = `Generate automation scripts with page objects classes in ${tool} and ${language} with ${framework} framework for the test cases in the uploaded csv file`;
   if (!req.files) {
     return res.status(400).send("No files were uploaded.");
@@ -80,7 +80,7 @@ app.post("/upload", async (req, res) => {
     fs.mkdirSync(tempFolder, { recursive: true });
   }
   const file = req.files.file;
-  filePath = path.join(tempFolder, file.name);
+  let filePath = path.join(tempFolder, file.name);
 
   file.mv(filePath, (err) => {
     // In case of a error throw err.
