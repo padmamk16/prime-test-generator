@@ -82,9 +82,12 @@ app.post("/upload", async (req, res) => {
   const file = req.files.file;
   let filePath = path.join(tempFolder, file.name);
 
-  file.mv(filePath, (err) => {
+  // Convert the binary data to a Buffer
+  const bufferData = Buffer.from(file.data);
+  fs.writeFileSync(filePath, bufferData, (err) => {
     // In case of a error throw err.
     if (err) throw err;
+    console.log("File written successfully");
   });
 
   let files = await OpenAIUtil.generateTestScript(testScriptTemplate, filePath);
@@ -93,7 +96,7 @@ app.post("/upload", async (req, res) => {
   });
 
   // Set the response headers
-  res.attachment("files.zip");
+  res.attachment("TestScripts.zip");
 
   zip.pipe(res);
   files.forEach((file) => {

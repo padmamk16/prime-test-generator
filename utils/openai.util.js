@@ -5,9 +5,9 @@ const fs = require('fs')
 
 // You will need to set these environment variables or edit the following values
 const endpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "endpoint";
-const apiKey = process.env["AZURE_OPENAI_API_KEY"] || "api-key";
+const apiKey = process.env["AZURE_OPENAI_API_KEY"] || "apiKey";
 const apiVersion = "2023-03-15-preview";
-const deployment = "deployment";
+const deployment = "AZURE_OPENAI_MODEL";
 
 class OpenAIUtil {
   static async generateTestCases(testCaseTemplate, fileName) {
@@ -31,7 +31,7 @@ class OpenAIUtil {
   static async generateTestData(testDataTemplate, fileName) {
     const client = new AzureOpenAI({ endpoint, apiKey, apiVersion, deployment });
     const completion = await client.completions.create({
-      model: "gpt-3.5-turbo-instruct",
+      model: deployment,
       prompt: testDataTemplate,
       max_tokens: 128
     });
@@ -60,38 +60,41 @@ class OpenAIUtil {
 
   static async generateTestScript(testScriptTemplate, filePath) {
     // Upload a file with an "assistants" purpose
-    const apiVersion = "2023-12-01-preview";
-    const client = new AzureOpenAI({ endpoint, apiKey, apiVersion, deployment });
+    const apiVersion = "2024-02-15-preview";
+    let deployment = "AZURE_OPENAI_MODEL";
+    let client = new AzureOpenAI({ endpoint, apiKey, apiVersion, deployment });
     const fileStream = fs.createReadStream(filePath);
-    const assistantFile = await client.files.create({
+    let assistantFile = await client.files.create({
       file: fileStream,
       purpose: "assistants",
-    });
-
+    });// Create your File object
+    
+    deployment = "AZURE_OPENAI_MODEL";
+    client = new AzureOpenAI({ endpoint, apiKey, apiVersion, deployment });
     // Create an assistant using the file ID
-    const assistant = await client.beta.assistants.create({
+    let assistant = await client.beta.assistants.create({
       instructions: testScriptTemplate,
-      model: "gpt-3.5-turbo-instruct",
-      tools: [{ type: "code_interpreter" }],
+      model: deployment,
+      tools: [{ "type" : "code_interpreter" }],
       tool_resources: {
-        code_interpreter: {
-          file_ids: [assistantFile.id],
-        },
-      },
+        "code_interpreter": {
+          "file_ids": [assistantFile.id],
+        }
+      }
     });
 
     const files = [];
 
     for (let i = 0; i < assistant.content; i++) {
       let fileName = assistant.content[i].annotations.file_path.file_id;
-      const response = await openai.files.content(fileName);
+      const response = await client.files.content(fileName);
       // Extract the binary data from the Response object
       const data = await response.arrayBuffer();
 
       // Convert the binary data to a Buffer
       const bufferData = Buffer.from(data);
       let filePath = `${tempFolder}\\${fileName}`;
-      fs.writeFile(filePath, bufferData, (err) => {
+      fs.writeFileSync(filePath, bufferData, (err) => {
         // In case of a error throw err.
         if (err) throw err;
         console.log("File written successfully");
