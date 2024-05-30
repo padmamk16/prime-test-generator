@@ -2,24 +2,25 @@ const { AzureOpenAI } = require("openai")
 const moment = require("moment");
 const path = require('path')
 const fs = require('fs')
+const jp = require('jsonpath')
 
 // You will need to set these environment variables or edit the following values
-const endpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "endpoint";
+const endpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "endPoint";
 const apiKey = process.env["AZURE_OPENAI_API_KEY"] || "apiKey";
 const apiVersion = "2023-03-15-preview";
-const deployment = "AZURE_OPENAI_MODEL";
+const deployment = "gpt-35-turbo-instruct-test";
 
 class OpenAIUtil {
   static async generateTestCases(testCaseTemplate, fileName) {
     const prompt = [testCaseTemplate]
     const client = new AzureOpenAI({ endpoint, apiKey, apiVersion, deployment });
     const completion = await client.completions.create({
-      prompt, 
+      prompt,
       model: deployment,
       max_tokens: 128
     });
 
-    let text =  completion.choices[0].text
+    let text = completion.choices[0].text
     let filePath = await this.getFilesFromCompletion(
       fileName,
       text
@@ -58,41 +59,47 @@ class OpenAIUtil {
     return `${tempFolder}\\${fileName}`;
   }
 
-  static async generateTestScript(testScriptTemplate, filePath) {
+  static async generateTestScript(testScriptTemplate, filePath, language) {
     // Upload a file with an "assistants" purpose
-    const apiVersion = "2024-02-15-preview";
-    let deployment = "AZURE_OPENAI_MODEL";
+    let apiVersion = "2024-02-15-preview";
+    let deployment = "gpt-35-turbo-test";
     let client = new AzureOpenAI({ endpoint, apiKey, apiVersion, deployment });
-    const fileStream = fs.createReadStream(filePath);
+    let fileStream = fs.createReadStream(filePath);
     let assistantFile = await client.files.create({
       file: fileStream,
       purpose: "assistants",
     });// Create your File object
-    
-    deployment = "AZURE_OPENAI_MODEL";
+
+    deployment = "gpt-4-test"
     client = new AzureOpenAI({ endpoint, apiKey, apiVersion, deployment });
     // Create an assistant using the file ID
     let assistant = await client.beta.assistants.create({
       instructions: testScriptTemplate,
-      model: deployment,
-      tools: [{ "type" : "code_interpreter" }],
-      tool_resources: {
-        "code_interpreter": {
-          "file_ids": [assistantFile.id],
-        }
-      }
+      model: "gpt-4-1106-preview",
+      tools: [{ "type": "code_interpreter" }],
+      "file_ids": [assistantFile.id]
     });
 
     const files = [];
 
     for (let i = 0; i < assistant.content; i++) {
-      let fileName = assistant.content[i].annotations.file_path.file_id;
-      const response = await client.files.content(fileName);
+      let file = jp.query(assistant.content[i], '$..file_id');
+      const response = await client.files.content(file);
       // Extract the binary data from the Response object
       const data = await response.arrayBuffer();
 
       // Convert the binary data to a Buffer
       const bufferData = Buffer.from(data);
+      let fileName = `Code${i + 1}`
+      if (language === 'csharp') {
+        fileName += '.cs'
+      } else if (language === 'java') {
+        fileName += '.java'
+      } else if (language === 'javascript') {
+        fileName += '.js'
+      } else {
+        fileName += '.py'
+      }
       let filePath = `${tempFolder}\\${fileName}`;
       fs.writeFileSync(filePath, bufferData, (err) => {
         // In case of a error throw err.

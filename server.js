@@ -90,7 +90,7 @@ app.post("/upload", async (req, res) => {
     console.log("File written successfully");
   });
 
-  let files = await OpenAIUtil.generateTestScript(testScriptTemplate, filePath);
+  let files = await OpenAIUtil.generateTestScript(testScriptTemplate, filePath, language);
   const zip = archiver("zip", {
     zlib: { level: 9 }, // Sets the compression level.
   });
