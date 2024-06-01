@@ -47,11 +47,13 @@ async function generateTestCase() {
     body: JSON.stringify(data),
   });
 
-  let excelData = await response.blob();
+  let resData = await response.json();
+  let str = resData.content
+  const blob = new Blob([str], { type: 'text/csv;charset=utf-8,' })
   let resHeader = response.headers.get("Content-Disposition");
   let fileName = resHeader.toString().split("filename=")[1];
-  const downloadExcelObjectURL = URL.createObjectURL(excelData);
-  downloadFileLink.href = downloadExcelObjectURL;
+  const downloadCsvObjectURL = URL.createObjectURL(blob);
+  downloadFileLink.href = downloadCsvObjectURL;
   downloadFileLink.setAttribute("download", fileName);
   document.querySelector("#overlay").style.visibility = "hidden";
   downloadFileLink.style.visibility = "visible";

@@ -40,9 +40,9 @@ app.post("/testCaseGenerator", async (req, res) => {
   let tcDesc = req.body.tcDesc,
     userInput = req.body.userInput,
     testCaseTemplate
-  let scenarioTCTemplate = `Generate all the critical scenarios, any additional scenarios to provide comprehensive coverage and edge cases for ${tcDesc} using JIRA Test Case template sections Test Case ID,Summary starting with verify, Preconditions, Test Steps, Expected Result, Priority, Labels, Test Type in a comma separated csv file`;
+  let scenarioTCTemplate = `Generate all the critical scenarios, any additional scenarios to provide comprehensive coverage and edge cases for ${tcDesc} using JIRA Test Case template sections Test Case ID,Summary starting with verify, Preconditions, Action, Expected Result, Priority, Labels, Test Type in a comma separated csv file.`;
 
-  let acTestCaseTemplate = `Generate all the critical scenarios, any additional scenarios to provide comprehensive coverage and edge cases for for below acceptance criteria using JIRA Test Case template sections Test Case ID,Summary starting with verify, Preconditions, Test Steps, Expected Result, Priority, Labels, Test Type in a comma separated csv file
+  let acTestCaseTemplate = `Generate all the critical scenarios, any additional scenarios to provide comprehensive coverage and edge cases for for below acceptance criteria using JIRA Test Case template sections Test Case ID,Summary starting with verify, Preconditions, Action, Expected Result, Priority, Labels, Test Type in a comma separated csv file
         Acceptance Criteria: `;
 
   if (userInput === "scenario") {
@@ -51,15 +51,15 @@ app.post("/testCaseGenerator", async (req, res) => {
     testCaseTemplate = acTestCaseTemplate;
   }
   let fileName = `TestCases_${moment().format("YYYYMMDD_hhmmss")}.csv`;
-  let filePath = await OpenAIUtil.generateTestCases(testCaseTemplate, fileName);
+  let text = await OpenAIUtil.generateTestCases(testCaseTemplate, fileName);
   res.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-  res.sendFile(filePath)
+  res.send({ content: text} )
 });
 
 app.post("/testDataGenerator", async (req, res) => {
   let swagger = req.body.swagger,
     endpoint = req.body.endpoint;
-  let testDataTemplate = `Generate all the possible combinations of test data based on the ${swagger} and the ${endpoint}`;
+  let testDataTemplate = `Generate all the possible combinations of test data based on the ${swagger} and the ${endpoint} endpoint`;
   let fileName = `TestData_${moment().format("YYYYMMDD_hhmmss")}.txt`;
   let filePath = await OpenAIUtil.generateTestData(testDataTemplate, fileName);
   res.setHeader("Content-Disposition", "attachment; filename=" + fileName);

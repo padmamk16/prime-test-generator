@@ -1,12 +1,11 @@
 const { AzureOpenAI } = require("openai")
-const moment = require("moment");
 const path = require('path')
 const fs = require('fs')
 const jp = require('jsonpath')
 
 // You will need to set these environment variables or edit the following values
 const endpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "endPoint";
-const apiKey = process.env["AZURE_OPENAI_API_KEY"] || "apiKey";
+const apiKey = process.env["AZURE_OPENAI_API_KEY"] || "apikey";
 const apiVersion = "2023-03-15-preview";
 const deployment = "gpt-35-turbo-instruct-test";
 
@@ -19,14 +18,8 @@ class OpenAIUtil {
       model: deployment,
       max_tokens: 128
     });
-
-    let text = completion.choices[0].text
-    let filePath = await this.getFilesFromCompletion(
-      fileName,
-      text
-    );
-
-    return filePath;
+    let text = completion.choices[0].text.replace(/\n\n/g,'\n')
+    return text;
   }
 
   static async generateTestData(testDataTemplate, fileName) {
