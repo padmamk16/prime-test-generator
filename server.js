@@ -40,20 +40,20 @@ app.post("/testCaseGenerator", async (req, res) => {
   let tcDesc = req.body.tcDesc,
     userInput = req.body.userInput,
     testCaseTemplate
-  let scenarioTCTemplate = `Generate all the critical scenarios, any additional scenarios to provide comprehensive coverage and edge cases for ${tcDesc} using JIRA Test Case template sections Test Case ID,Summary starting with verify, Preconditions, Action, Expected Result, Priority, Labels, Test Type in a comma separated csv file.`;
+  let scenarioTCTemplate = `Generate all the critical scenarios, any additional scenarios to provide comprehensive coverage and edge cases for ${tcDesc} using JIRA Test Case template sections Test Case ID,Summary starting with verify, Preconditions, Action, Expected Result, Priority, Labels, Test Type in a semi-colon separated csv file. Combine action into a single column in csv.`;
 
-  let acTestCaseTemplate = `Generate all the critical scenarios, any additional scenarios to provide comprehensive coverage and edge cases for for below acceptance criteria using JIRA Test Case template sections Test Case ID,Summary starting with verify, Preconditions, Action, Expected Result, Priority, Labels, Test Type in a comma separated csv file
+  let acTestCaseTemplate = `Generate all the critical scenarios, any additional scenarios to provide comprehensive coverage and edge cases for below acceptance criteria using JIRA Test Case template sections Test Case ID,Summary starting with verify, Preconditions, Action, Expected Result, Priority, Labels, Test Type in a semi-colon separated csv file. Combine action into a single column in csv.
         Acceptance Criteria: `;
 
   if (userInput === "scenario") {
     testCaseTemplate = scenarioTCTemplate;
   } else {
-    testCaseTemplate = acTestCaseTemplate;
+    testCaseTemplate = acTestCaseTemplate + tcDesc;
   }
   let fileName = `TestCases_${moment().format("YYYYMMDD_hhmmss")}.csv`;
   let text = await OpenAIUtil.generateTestCases(testCaseTemplate, fileName);
   res.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-  res.send({ content: text} )
+  res.send({ content: text })
 });
 
 app.post("/testDataGenerator", async (req, res) => {

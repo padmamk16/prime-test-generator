@@ -5,9 +5,9 @@ const jp = require('jsonpath')
 
 // You will need to set these environment variables or edit the following values
 const endpoint = process.env["AZURE_OPENAI_ENDPOINT"] || "endPoint";
-const apiKey = process.env["AZURE_OPENAI_API_KEY"] || "apikey";
+const apiKey = process.env["AZURE_OPENAI_API_KEY"] || "apiKey";
 const apiVersion = "2023-03-15-preview";
-const deployment = "gpt-35-turbo-instruct-test";
+const deployment = "gpt-35-turbo-instruct"; // your deployment name
 
 class OpenAIUtil {
   static async generateTestCases(testCaseTemplate, fileName) {
@@ -19,6 +19,7 @@ class OpenAIUtil {
       max_tokens: 128
     });
     let text = completion.choices[0].text.replace(/\n\n/g,'\n')
+    text = text.substring(1)
     return text;
   }
 
@@ -55,15 +56,15 @@ class OpenAIUtil {
   static async generateTestScript(testScriptTemplate, filePath, language) {
     // Upload a file with an "assistants" purpose
     let apiVersion = "2024-02-15-preview";
-    let deployment = "gpt-35-turbo-test";
+    let deployment = "gpt-35-turbo-test";  // your deployment name
     let client = new AzureOpenAI({ endpoint, apiKey, apiVersion, deployment });
     let fileStream = fs.createReadStream(filePath);
     let assistantFile = await client.files.create({
       file: fileStream,
       purpose: "assistants",
-    });// Create your File object
+    });
 
-    deployment = "gpt-4-test"
+    deployment = "gpt-4-test"  // your deployment name
     client = new AzureOpenAI({ endpoint, apiKey, apiVersion, deployment });
     // Create an assistant using the file ID
     let assistant = await client.beta.assistants.create({

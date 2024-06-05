@@ -10,8 +10,10 @@ function onLoad() {
 
 async function updateMessage(value) {
   if (value === "scenario") {
-    tcDesc.placeholder = `Enter single scenario like 'user login flow' or multiple scenarios separated by semi-colon like 'user login flow; search flights in makemytrip.com'`;
+    tcDesc.placeholder = ''
+    tcDesc.placeholder = `Enter single scenario like 'user login flow' or multiple scenarios like 'user login flow; search flights in makemytrip.com'`;
   } else {
+    tcDesc.placeholder = ''
     tcDesc.placeholder = `Provide your acceptance criteria like below
     For a checkout page on a store’s website:
 
@@ -49,7 +51,7 @@ async function generateTestCase() {
 
   let resData = await response.json();
   let str = resData.content
-  const blob = new Blob([str], { type: 'text/csv;charset=utf-8,' })
+  const blob = new Blob([str], { type: 'text/csv' })
   let resHeader = response.headers.get("Content-Disposition");
   let fileName = resHeader.toString().split("filename=")[1];
   const downloadCsvObjectURL = URL.createObjectURL(blob);
